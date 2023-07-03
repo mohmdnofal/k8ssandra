@@ -1,0 +1,111 @@
+apiVersion: k8ssandra.io/v1alpha1
+kind: K8ssandraCluster
+metadata:
+  name: demo
+spec:
+  cassandra:
+    serverVersion: 4.0.3
+    telemetry:
+      prometheus:
+        enabled: true
+    storageConfig:
+      cassandraDataVolumeClaimSpec:
+        storageClassName: managed-premium
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 5Gi
+    config:
+      jvmOptions:
+        heapSize: 512M
+    networking:
+      hostNetwork: false
+    datacenters:
+      - metadata:
+           name: dc1-northeurope
+        k8sContext: cassandra-cluster-northeurope
+        size: 3
+        # tolerations:
+        #   - key: "app"
+        #     operator: "Equal"
+        #     value: "cassandra"
+        #     effect: "NoSchedule"        
+        stargate:
+          size: 1
+          heapSize: 256M
+          allowStargateOnDataNodes: true
+          telemetry:
+            prometheus:
+              enabled: true
+        racks:
+          - name: northeurope-1
+            nodeAffinityLabels:
+                topology.kubernetes.io/zone: northeurope-1
+                agentpool: cassandraz1
+          - name: northeurope-2
+            nodeAffinityLabels:
+                topology.kubernetes.io/zone: northeurope-2
+                agentpool: cassandraz2
+          - name: northeurope-3
+            nodeAffinityLabels:
+                topology.kubernetes.io/zone: northeurope-3
+                agentpool: cassandraz3                        
+      - metadata:
+           name: dc2-westeurope
+        k8sContext: cassandra-cluster-westeurope
+        size: 3
+        # tolerations:
+        #   - key: "app"
+        #     operator: "Equal"
+        #     value: "cassandra"
+        #     effect: "NoSchedule"         
+        stargate:
+          size: 1
+          heapSize: 256M
+          allowStargateOnDataNodes: true      
+          telemetry:
+            prometheus:
+              enabled: true
+        racks:
+          - name: westeurope-1
+            nodeAffinityLabels:
+                topology.kubernetes.io/zone: westeurope-1
+                agentpool: cassandraz1
+          - name: westeurope-2
+            nodeAffinityLabels:
+                topology.kubernetes.io/zone: westeurope-2
+                agentpool: cassandraz2
+          - name: westeurope-3
+            nodeAffinityLabels:
+                topology.kubernetes.io/zone: westeurope-3
+                agentpool: cassandraz3                    
+      - metadata:
+           name: dc3-uksouth
+        k8sContext: cassandra-cluster-uksouth
+        size: 3
+        # tolerations:
+        #   - key: "app"
+        #     operator: "Equal"
+        #     value: "cassandra"
+        #     effect: "NoSchedule"          
+        stargate:
+          size: 1
+          heapSize: 256M
+          allowStargateOnDataNodes: true
+          telemetry:
+            prometheus:
+              enabled: true
+        racks:
+          - name: uksouth-1
+            nodeAffinityLabels:
+                topology.kubernetes.io/zone: uksouth-1
+                agentpool: cassandraz1
+          - name: uksouth-2
+            nodeAffinityLabels:
+                topology.kubernetes.io/zone: uksouth-2
+                agentpool: cassandraz2
+          - name: northeurope-3
+            nodeAffinityLabels:
+                topology.kubernetes.io/zone: uksouth-3
+                agentpool: cassandraz3
